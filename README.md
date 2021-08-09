@@ -11,6 +11,6 @@ Ocean Potential Temperature of the last 2k years (15 - 2015 CE)
 
 * MATLAB codes
 
- `XX.m`: main driver, start here \
+ `OPT2k_driver.m`: main driver, start here \
 
 MATLAB code requires pulling information from Gebbie & Huybers 2019 (Science) from NCEI archive.
