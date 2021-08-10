@@ -9,12 +9,14 @@ if ~exist('../gsw') & ~exist('../../gsw')
     unzip gsw_matlab_v3_06_13.zip ../gsw
     !rm gsw_matlab_v3_06_13.zip
     %gsw_check_functions 
-        rootdir = '../'
+        rootdir = '../';
 elseif exist('../gsw')
-        rootdir = '../'
+        rootdir = '../';
 elseif exist('../../gsw')
-        rootdir = '../../'
+        rootdir = '../../';
 end
+
+% if not already in path, then add to path
 addpath([rootdir,'gsw'])
 addpath([rootdir,'gsw/html'])
 addpath([rootdir,'gsw/library'])

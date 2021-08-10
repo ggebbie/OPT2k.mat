@@ -8,6 +8,9 @@ addpath('../src')
 % Load HMS Challenger observations
 challenger_obs
 
+% set up E observational matrices for basinwide temperature obs
+Ebasins
+
 %% Get appropriate green functions.
 % Use 2 x 2 degree circulation model.
 
