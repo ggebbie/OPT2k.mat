@@ -10,7 +10,12 @@ The inversion was identified as OPT-0015 in the paper.
 `scripts`: MATLAB programs (start here) \
 `src`: MATLAB source code 
 
-User-generated directories
+* User-generated directories
 
 `data`: input data files for MATLAB code \
 `output`: output files 
+
+* Dependencies
+
+OPT2k requires the TMI package. You can clone it manually with
+`git clone https://github.com/ggebbie/TMI` or follow the MATLAB scripts. The latest main branch may be required for consistency. 
