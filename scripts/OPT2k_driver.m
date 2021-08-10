@@ -5,6 +5,9 @@
 % helper functions/scripts live here
 addpath('../src')
 
+% Load HMS Challenger observations
+challenger_obs
+
 %% Get appropriate green functions.
 % Use 2 x 2 degree circulation model.
 
