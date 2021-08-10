@@ -9,11 +9,13 @@ The inversion was identified as OPT-0015 in the paper.
 
 `scripts`: MATLAB programs (start here) \
 `src`: MATLAB source code 
-
-* User-generated directories
-
 `data`: input data files for MATLAB code \
-`output`: output files 
+`output`: output files, user-generated directory
+
+* Data files
+
+Challenger_WOCE_Temperature_basinwide_avg.mat (20 July 2018 version) \
+Challenger_WOCE_Temperature_list.mat 
 
 * Dependencies
 
