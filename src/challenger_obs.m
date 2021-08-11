@@ -1,6 +1,9 @@
 %% Challenger_WOCE Temperature Structure halfdegree was updated 
 %  to be in list form.
 
+% is data already in the path? if not, then
+addpath('../data')
+
 load Challenger_WOCE_Temperature_list
 
 % observational matrix

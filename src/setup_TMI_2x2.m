@@ -2,17 +2,20 @@
 if ~exist('../TMI') & ~exist('../../TMI')
     display('clone TMI project')
     !git clone https://github.com/ggebbie/TMI ../TMI
-    TMIdir = '../TMI/src/';
-elseif exist('../TMI/src/')
+    TMIdir = '../TMI/';
+elseif exist('../TMI/')
     display('TMI project available')
-    TMIdir = '../TMI/src/';
+    TMIdir = '../TMI/';
 elseif exist('../../TMI')
-    TMIdir = '../../TMI/src/';
+    display('TMI project available')
+    TMIdir = '../../TMI/';
 end
 addpath(TMIdir)
 
 cd ..
-read_TMI_from_google_drive
+display('read_TMI_from_google_drive m-file not working')
+display('use read_TMI_from_google_drive.sh')
+%read_TMI_from_google_drive
 cd scripts
 datadir = '../data';
 addpath(datadir)
