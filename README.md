@@ -19,5 +19,5 @@ Challenger_WOCE_Temperature_list.mat
 
 * Dependencies
 
-OPT2k requires the TMI package. You can clone it manually with
+OPT2k requires the TMI package v.0.8.2 or greater. You can clone it manually with
 `git clone https://github.com/ggebbie/TMI` or follow the MATLAB scripts. The latest main branch may be required for consistency. 
