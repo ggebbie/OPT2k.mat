@@ -53,6 +53,7 @@ E_obs_atlz = Ebar5*E_atlz;
 % is this consistent with the rest of the code?
 dt_model = 5;
 lag = 0:dt_model:2000;
+lagmid = (lag(1:end-1)+lag(2:end))./2;
 
 for zz = 1:Nobsz
     zz
@@ -83,4 +84,4 @@ G_Hindz   = process_master_greens_functions(E_Hindz,tg,lag,Nmode,rootname,region
 G_Hsthz   = process_master_greens_functions(E_Hsthz,tg,lag,Nmode,rootname,regions);
 G_H       = process_master_greens_functions(E_H,tg,lag,Nmode,rootname,regions);
 G_Hwm     = process_master_greens_functions(E_Hwm,tg,lag,Nmode,rootname,regions);
-G_z2500   = process_master_greens_functions(E_z2500,tg,lag,Nmode,rootname,regions);
+G_z2500    = process_master_greens_functions(Ez2500,tg,lag,Nmode,rootname,regions);

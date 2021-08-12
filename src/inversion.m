@@ -15,37 +15,7 @@ ytilde_15eq = [DT_obs_pacz(iz); DT_obs_atlz(iz)];
 ntilde_15eq = ytilde_15eq - y;
 J_15eq = ntilde_15eq'*iW*ntilde_15eq
 
-
-%% Optimize. 
-% Get weights on surface changes. Use standard deviation of
-%  HadISST.
-ibreak = 29;
-ustd = std(b0(1:ibreak,:));
-ustd = max(ustd,0.1);
-
-% get a weak constraint on control.
-% Trust more recent stuff more than old stuff.
-wfunk = (1:Nty)'/100;
-wfunk(wfunk>1) = 1;
-
-%% control adjustments a little too big. Put factor 1/4 here.
-uerr_dim = 0.5.*(wfunk*ustd);
-uerr = uerr_dim(:);
-Nu = length(uerr);
-
-%% temporal smoothing lengthscale = 80 years for controls.
-Srho = zeros(Nty);
-for tt = 1:Nty-1
-  Srho(tt,1:Nty-1) = exp(-((ty(1:Nty-1)-ty(tt))./100).^2);
-end
-%initial condition is special. No covariance.
-Srho(Nty,Nty) = 1;
-
-for nmode = 1:Nmode
-  Sdim{nmode} = (uerr_dim(:,nmode)*uerr_dim(:,nmode)').*Srho;
-end
-S = Nu.*(blkdiag(Sdim{1:Nmode}) + 1e-4.*eye(Nu));
-iS = inv(S);
+config_controls
 
 %% Get global mean constraint.
 tmp = reshape(G_gloz,Nz,Nty,Nmode);
@@ -64,6 +34,7 @@ yhat = y-ytilde_15eq;
 % add global mean constraint.
 yhat(end+1:end+400) = 0;
 
+% should be included in config_controls
 Tbarerr = 0.05;
 Wbar  = Nty.*Tbarerr.^2.*eye(Nty);
 iWbar = inv(Wbar);
@@ -78,6 +49,8 @@ ESET = Ghat*SET;
 ESETW = ESET+What;
 du_15opt = SET*(ESETW\yhat);
 b_15opt  = b_15eq + du_15opt;
+
+% dimensionalize it so that regions and time have separate dimensions.
 b_15opt_dim = reshape(b_15opt,400,14);
 
 %% Is the fit to data improved?

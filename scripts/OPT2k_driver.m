@@ -13,11 +13,11 @@ config_observations
 
 %% configure model
 config_model
-'
+
 %% configure first-guess variables and stats
 config_firstguess
 
-%% invert observations for solution
+%% combine model and observations for solution
 inversion
 
 %% diagnostics

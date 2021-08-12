@@ -5,12 +5,6 @@
 
 %  Future work: show how HadISST is analyzed.
 
-%% time axis.
-tyend = 2012.5-lagmid(end);
-ty = 2012.5:-5:tyend;
-Nty = length(ty);
-ibreak = find(ty>1870);
-ibreak = ibreak(end);
 
 %% Blend HadISST with Ocean2k SST.
 load SST_hadisst1.1.mat
@@ -43,7 +37,7 @@ grid
 outputdir = '../output';
 if ~exist(outputdir)
     !mkdir ../output
-    filename = [outputdir,'/Joffset_',date];
+    filename = [outputdir,'/Joffset_',date,'.eps'];
     print(filename,'-depsc')
 end
         
