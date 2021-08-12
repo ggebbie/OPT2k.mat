@@ -2,8 +2,7 @@
 
 %% get the right levels for a plan view.
 isfc(Nsfc+1) = Nfield+1; % overflow, numerical trick to simplify code below
-for zz = 1:Nzobs
-    zz
+for zz = 1:Nobsz
     zdepth = depthlist(zz);
     
     % get the depth weighting.
@@ -34,9 +33,9 @@ for zz = 1:Nzobs
     end        
 end
 
-%% get the right levels for a plan view on a grid level of the model.
+%% get the right levels for a plan view 
+%  on a grid level of the model.
 for zz = 1:NZ
-    zz
     zdepth = DEPTH(zz);
     
     % get the depth weighting.
@@ -70,7 +69,6 @@ end
 %% Palmer et al. (2015) plot.
 % integrate K*m below 700 meters.
 ilist = []; jlist = []; klist= []; jlist2 = []; jlist3 = [];
-Nsfc = sum(kt==1)
 for ns = 1:Nsfc
     ii = it(isfc(ns));
     jj = jt(isfc(ns));

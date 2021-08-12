@@ -2,13 +2,13 @@
 if ~exist('../TMI') & ~exist('../../TMI')
     display('clone TMI project')
     !git clone https://github.com/ggebbie/TMI ../TMI
-    TMIdir = '../TMI/';
+    TMIdir = '../TMI/src/';
 elseif exist('../TMI/')
     display('TMI project available')
-    TMIdir = '../TMI/';
+    TMIdir = '../TMI/src/';
 elseif exist('../../TMI')
     display('TMI project available')
-    TMIdir = '../../TMI/';
+    TMIdir = '../../TMI/src/';
 end
 addpath(TMIdir)
 
