@@ -1,5 +1,7 @@
 %% programming: lots of copied code, should be a function to handle this
 
+Nz = NZ;
+
 %%% woce
 G_pacz_3d = reshape(G_pacz,Nz,Nty,Nmode);
 G_pacz_woce_3d= get_Gwoce(G_pacz_3d,ty);
@@ -113,13 +115,14 @@ G_cmeters_1995 = reshape(G_cmeters_1995,Nsfc,Nty.*Nmode);
 G_cmeters_1970 = get_Gt(G_cmeters_3d,10);
 G_cmeters_1970 = reshape(G_cmeters_1970,Nsfc,Nty.*Nmode);
 
-G_all_3d = reshape(G_all,Nfield,Nty,Nmode);
-G_all_woce = get_Gwoce(G_all_3d,ty);
-G_all_woce = reshape(G_all_woce,Nfield,Nty.*Nmode);
+% G_all not calculated
+% G_all_3d = reshape(G_all,Nfield,Nty,Nmode);
+% G_all_woce = get_Gwoce(G_all_3d,ty);
+% G_all_woce = reshape(G_all_woce,Nfield,Nty.*Nmode);
 
-G_all_3d = reshape(G_all,Nfield,Nty,Nmode);
-G_all_chall = get_Gchall(G_all_3d,ty);
-G_all_chall = reshape(G_all_chall,Nfield,Nty.*Nmode);
+% G_all_3d = reshape(G_all,Nfield,Nty,Nmode);
+% G_all_chall = get_Gchall(G_all_3d,ty);
+% G_all_chall = reshape(G_all_chall,Nfield,Nty.*Nmode);
 
 G_z2500_3d = reshape(G_z2500,Nsfc,Nty,Nmode);
 G_z2500_woce = get_Gwoce(G_z2500_3d,ty);
@@ -130,7 +133,7 @@ G_z2500_chall = get_Gchall(G_z2500_3d,ty);
 G_z2500_chall = reshape(G_z2500_chall,Nsfc,Nty.*Nmode);
 
 %% make plan view
-for zz = 1:Nzobs
+for zz = 1:Nobsz
     zz
     G_plan_3d = reshape(G_plan{zz},Nsfc,Nty,Nmode);
 

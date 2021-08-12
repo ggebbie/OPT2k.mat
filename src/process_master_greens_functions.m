@@ -11,7 +11,7 @@ function [G] = process_master_greens_functions(E,time,lag,Nmode,rootname,regions
     for nmode = 1:Nmode
         tic
         nmode
-        filename = [rootname,num2str(regions(nmode)),'.mat']
+        filename = [rootname,num2str(regions(nmode)),'_2x2.mat']
         eval(['load ',filename])
         % don't take diff yet.
         CDF(:,:,nmode)  = E*C(1:Ntime,:)';
@@ -23,13 +23,12 @@ function [G] = process_master_greens_functions(E,time,lag,Nmode,rootname,regions
     CDF(1,:) = 0;
 
     %% next interpolate onto evenly spaced grid. Then take difference.
-    lagmid = (lag(1:end-1)+lag(2:end))./2
+    lagmid = (lag(1:end-1)+lag(2:end))./2;
     Nlag = length(lag);
 
     % not actually a CDF2 here. actually CDF evenly spaced.
     CDF2 = zeros(Nlag,Nobs.*Nmode);
     for nlag = 1:Nlag;
-        nlag
         t_current = lag(nlag);
         tindex = interp1(time,1:Ntime,t_current);
         s = zeros(1,Ntime);

@@ -19,5 +19,11 @@ Challenger_WOCE_Temperature_list.mat
 
 * Dependencies
 
-OPT2k requires the TMI package v.0.8.2 or greater. You can clone it manually with
-`git clone https://github.com/ggebbie/TMI` or follow the MATLAB scripts. The latest main branch may be required for consistency. 
+OPT2k requires the TMI package v.0.8.2 or greater. You can clone it
+manually with `git clone https://github.com/ggebbie/TMI` or follow the
+MATLAB scripts. If TMI already exists in your configuration, the code
+will not check for the latest version, but it may be required for
+consistency.
+
+Code has been tested for MATLAB version 9.10.0.1602886 (R2021a).
+

@@ -24,12 +24,14 @@ NY = length(years)
 % MV ARC FROM 7 -> 6
 % MV med FROM 8 -> 7
 
-smallregions = true
+smallregions = true;
 if ~smallregions
     % short list of larger regions
+    display('8 large regions')
     regions = 1:8 ; 
 else
     % long list of small regions
+    display('14 small regions')
     regions = [5 7 8 9 10 11 12 13 14 15 16 17 18 19];
 end
 
@@ -50,7 +52,7 @@ end
 for nmode = regions
   display(['patch number ',num2str(nmode)])
   
-  filename = ['../output/green_region_2x2_',num2str(nmode)]
+  filename = ['../output/green_region',num2str(nmode),'_2x2']
 
   % initialize potential temperature field
   c0 = zeros(Nfield,1);

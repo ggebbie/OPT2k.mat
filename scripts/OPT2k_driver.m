@@ -5,29 +5,20 @@
 % helper functions/scripts live here
 addpath('../src')
 
-% Load HMS Challenger observations
-challenger_obs
+%% obtain 2x2 degree model input from TMI repository
+setup_TMI_2x2 
 
-% set up E observational matrices for basinwide temperature obs
-Ebasins
+%% configure observations
+config_observations
 
-% set up other necessary and worthwhile E matrices
-Ediags
+%% configure model
+config_model
 
-%% Get appropriate green functions.
-% Use 2 x 2 degree circulation model.
+%% configure first-guess variables and stats
+config_firstguess
 
-% obtain 2x2 degree model input from TMI repository
-setup_TMI_2x2
-
-green_functions_regions
-
-master_greens_functions
-
-setup_basinwide_greens_functions
-
-SST_first_guess
-
+%% combine model and observations for solution
 inversion
 
+%% diagnostics
 % inversion_diags; not checked in yet

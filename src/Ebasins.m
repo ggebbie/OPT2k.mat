@@ -60,8 +60,9 @@ E_sth = (vol.*c_sth)'./sum(vol.*c_sth);
 
 %% get E for heat content.
 
-gsw = true %  use Gibbs seawater toolbox
+gsw = true; %  use Gibbs seawater toolbox
 if gsw
+    display('using Gibbs seawater toolbox')
     instantiate_gsw
 
     load tracerobs_2deg_33lev_woce.mat Tobs Terr Sobs
@@ -87,6 +88,7 @@ E_Hatl = (r.*c_atl')./1e21;
 E_Hsth = (r.*c_sth')./1e21;
 E_Hind = (r.*c_ind')./1e21;
 
+Nwm= size(d_all,2);
 for nwm = 1:Nwm
   E_Hwm(nwm,:) = (r.*c_all(:,nwm)')./1e21;
 end

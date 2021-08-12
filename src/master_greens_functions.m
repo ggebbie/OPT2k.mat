@@ -2,11 +2,10 @@
 
 % set known parameters
 Nobs = size(E_obs,1);
-Nobsz = length(depthlist)
+Nobsz = length(depthlist);
 
 % number of water masses in d_all
 Nwm= size(d_all,2);
-Ntg = length(tg);
 Nmode = length(regions); % number of surface patches/modes
 
 %% Choose how many Green's functions
@@ -15,7 +14,7 @@ Nmode = length(regions); % number of surface patches/modes
 % 3: optimal water masses: rootname = '/hoth/glacial/gebbie/mdata/ohc/green_wms/green_wm';
 % 4: HadSST EOFs: rootname = '/hoth/glacial/gebbie/mdata/ohc/green_ssteofs/green';
 % 5: surface regions:
-rootname = datadir; % directory with impulse response simulations
+rootname = '../output/green_region'; % directory with impulse response simulations
 
 % 4x4 regions.
 %regions = [5     6     7     9    10    11    12    13    14    15    16    17    18    19];
@@ -23,7 +22,7 @@ rootname = datadir; % directory with impulse response simulations
 % 2x2 regions: already set
 % regions = [5 7 8 9 10 11 12 13 14 15 16 17 18 19];
 
-% time for Green's function
+%% time variables for Green's functions
 tg = T;
 Ntg = length(tg);
 
@@ -32,8 +31,7 @@ tau = (tg(1:end-1)+tg(2:end))./2;
 Ntau = length(tau);
 
 %%% interpolate onto evenly spaced lags. 
-tmp = interp1(DEPTH,1:NZ,depthlist)
-Nzobs = length(depthlist);
+tmp = interp1(DEPTH,1:NZ,depthlist);
 
 flist = floor(tmp);
 clist = ceil(tmp);
@@ -42,8 +40,8 @@ clist = ceil(tmp);
 weight1 = tmp - flist;
 weight2 = clist - tmp;
 weight1 (weight1 + weight2 ==0) = 1;
-Ebar3 = sparse(1:Nzobs,clist,weight1,Nzobs,NZ);
-Ebar4 = sparse(1:Nzobs,flist,weight2,Nzobs,NZ);
+Ebar3 = sparse(1:Nobsz,clist,weight1,Nobsz,NZ);
+Ebar4 = sparse(1:Nobsz,flist,weight2,Nobsz,NZ);
 Ebar5 = Ebar3 + Ebar4;
 
 % is pacz available?
@@ -55,8 +53,9 @@ E_obs_atlz = Ebar5*E_atlz;
 % is this consistent with the rest of the code?
 dt_model = 5;
 lag = 0:dt_model:2000;
+lagmid = (lag(1:end-1)+lag(2:end))./2;
 
-for zz = 1:Nzobs
+for zz = 1:Nobsz
     zz
   G_plan{zz} = process_master_greens_functions(Eplan{zz},tg,lag,Nmode,rootname,regions);
 end
@@ -85,4 +84,4 @@ G_Hindz   = process_master_greens_functions(E_Hindz,tg,lag,Nmode,rootname,region
 G_Hsthz   = process_master_greens_functions(E_Hsthz,tg,lag,Nmode,rootname,regions);
 G_H       = process_master_greens_functions(E_H,tg,lag,Nmode,rootname,regions);
 G_Hwm     = process_master_greens_functions(E_Hwm,tg,lag,Nmode,rootname,regions);
-G_z2500   = process_master_greens_functions(E_z2500,tg,lag,Nmode,rootname,regions);
+G_z2500    = process_master_greens_functions(Ez2500,tg,lag,Nmode,rootname,regions);
