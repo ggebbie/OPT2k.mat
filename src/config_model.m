@@ -1,6 +1,9 @@
 %% Configure model
 
 %% time axis.
+dt_model = 5;
+lag = 0:dt_model:2000;
+lagmid = (lag(1:end-1)+lag(2:end))./2;
 tyend = 2012.5-lagmid(end);
 ty = 2012.5:-5:tyend;
 Nty = length(ty);
