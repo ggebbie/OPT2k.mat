@@ -5,4 +5,3 @@ function J = challengercost(Gchall,y,b,iW)
     ntilde = ytilde - y;
     J = ntilde'*iW*ntilde;
 end
-

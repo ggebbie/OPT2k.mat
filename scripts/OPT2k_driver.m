@@ -23,6 +23,5 @@ config_controls
 %% combine model and observations for solution
 combine_model_obs
 
-
 %% diagnostics
 % inversion_diags; not checked in yet
