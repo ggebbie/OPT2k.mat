@@ -28,6 +28,7 @@ tau = (tg(1:end-1)+tg(2:end))./2; % equal to tgmid
 Ntau = length(tau);
 
 %% linear interpolation in depth
+%  transfer model depths to Challenger obs depths
 tmp = interp1(DEPTH,1:NZ,depthlist);
 
 flist = floor(tmp);
@@ -60,6 +61,8 @@ Ntcal = length(tcal);
 ibreak = find(tcal>1870);
 ibreak = ibreak(end);
 
+%% interpolate impulse responses to even temporal spacing and convert CDF to PDF
+%  use `process_master_greens_functions` to do the heavy lifting
 for zz = 1:Nobsz
     zz
   G_plan{zz} = process_master_greens_functions(Eplan{zz},tg,lag,Nmode,rootname,regions);
@@ -71,7 +74,7 @@ for zz = 1:NZ
     G_planmodel{zz} = process_master_greens_functions(Eplanmodel{zz},tg,lag,Nmode,rootname,regions);
 end
 
-%% Other diagnostics.
+%% Other diagnostics, some not actually needed for inversion
 G_cmeters = process_master_greens_functions(Ecmeters,tg,lag,Nmode,rootname,regions);
 G_obs     = process_master_greens_functions(E_obs,tg,lag,Nmode,rootname,regions);
 G_obs_pacz= process_master_greens_functions(E_obs_pacz,tg,lag,Nmode,rootname,regions);

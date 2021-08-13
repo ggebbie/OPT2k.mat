@@ -20,23 +20,23 @@ mTaz_LS(2) = (mTaz_LS(1) + mTaz_LS(2))./2;
 
 % depth levels to be analyzed
 % what is rationale for cutting this?
-iz = 2:15;
+zchall = 2:15;
 
 % Pacific observational profile
-ypac = -mTpz_LS(iz);
+ypac = -mTpz_LS(zchall);
 
 % Atlantic
-yatl = -mTaz_LS(iz);
+yatl = -mTaz_LS(zchall);
 
 % one observational vector
 y = [ypac; yatl];
 Nobschall = length(ypac);
 
 % error covariance matrix.
-Cxbar = blkdiag(mTpz_C(iz,iz),mTaz_C(iz,iz));
+Cxbar = blkdiag(mTpz_C(zchall,zchall),mTaz_C(zchall,zchall));
 
-% inverse normalized weighting matrix
+% inverse normalzchalled weighting matrix
 iW = 1./(2.*Nobschall).*inv(Cxbar);
 
-% normalized weighting matrix
+% normalzchalled weighting matrix
 W  = (2.*Nobschall).*Cxbar;

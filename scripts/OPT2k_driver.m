@@ -6,7 +6,7 @@
 addpath('../src')
 
 %% obtain 2x2 degree model input from TMI repository
-setup_TMI_2x2 
+config_TMI_2x2 
 
 %% configure observations
 config_observations
@@ -17,8 +17,12 @@ config_model
 %% configure first-guess variables and stats
 config_firstguess
 
+%% configure the control variables and their weights.
+config_controls
+
 %% combine model and observations for solution
 combine_model_obs
+
 
 %% diagnostics
 % inversion_diags; not checked in yet

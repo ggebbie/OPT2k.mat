@@ -1,7 +1,11 @@
-%% programming: lots of copied code, should be a function to handle this
+%% Preparing to make the convolution a simple linear matrix operation.
+%  Slide the green's functions in time.
+%  Put the green's function relative to the right target time. 
+%  programming: lots of copied code, should be a function to handle this
+
 Nz = NZ; % should choose a preferred notation
 
-%%% woce
+%%% woce: 1990s
 G_pacz_3d = reshape(G_pacz,Nz,Ntcal,Nmode);
 G_pacz_woce_3d= get_Gwoce(G_pacz_3d,tcal);
 G_pacz_woce   = reshape(G_pacz_woce_3d,Nz,Ntcal.*Nmode);
