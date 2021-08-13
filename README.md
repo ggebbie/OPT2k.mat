@@ -15,7 +15,7 @@ The inversion was identified as OPT-0015 in the paper.
 * Data files
 
 Challenger_WOCE_Temperature_basinwide_avg.mat (20 July 2018 version) \
-Challenger_WOCE_Temperature_list.mat 
+Challenger_WOCE_Temperature_list.mat (13 June 2018 version)
 
 * Dependencies
 
@@ -25,6 +25,7 @@ manually with `git clone https://github.com/ggebbie/TMI` or follow the
 MATLAB scripts. OPT2k checks if the TMI package already exists in the `OPT2k`
 directory or one directory up the file heirarchy. 
 
-`wget` is used to download the optional dependent package `gsw` (Gibbs seawater toolbox for MATLAB).
+`wget` is used to download the optional dependent package `gsw` (Gibbs
+seawater toolbox for MATLAB).
 
 Code has been tested for MATLAB version 9.10.0.1602886 (R2021a).
