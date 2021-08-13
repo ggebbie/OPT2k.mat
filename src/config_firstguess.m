@@ -5,7 +5,6 @@
 
 %  Future work: show how HadISST is analyzed.
 
-
 %% Blend HadISST with Ocean2k SST.
 load SST_hadisst1.1.mat
 
@@ -13,7 +12,7 @@ load SST_hadisst1.1.mat
 blist = -.5:.025:.5;
 for bb = 1:length(blist)
 
-    b_dim = blend_Tsubduct(ty,b_hadisst,1,blist(bb));
+    b_dim = blend_Tsubduct(tcal,b_hadisst,1,blist(bb));
 
     DT_pacz = (G_pacz_woce-G_pacz_chall)*b_dim(:);
     DT_atlz = (G_atlz_woce-G_atlz_chall)*b_dim(:);
@@ -43,14 +42,14 @@ end
         
 boffset = 0.0674; % read off figure
 % first guess SST boundary conditio
-b0 = blend_Tsubduct(ty,b_hadisst,1,boffset);
+b0 = blend_Tsubduct(tcal,b_hadisst,1,boffset);
 
-function b_dim = blend_Tsubduct(ty,b_hadisst,a,b)
-% function b_dim = blend_Tsubduct(ty,b_hadisst,a,b)
+function b_dim = blend_Tsubduct(tcal,b_hadisst,a,b)
+% function b_dim = blend_Tsubduct(tcal,b_hadisst,a,b)
 
 % load Ocean2k average of 57 records 
     load composite_23Aug17
-    SSTproxy = interp1(year,SST(2,:),ty);
+    SSTproxy = interp1(year,SST(2,:),tcal);
     
     % remove mean from paleo.
     SSTproxy = SSTproxy - nanmean(SSTproxy);
@@ -69,13 +68,13 @@ function b_dim = blend_Tsubduct(ty,b_hadisst,a,b)
     % get the blending weight.
     % w = instrumental weight.
     % 1-w = proxy weight.
-    w = 0.*ty;
-    w(ty<1870) = 0;
-    w(ty>1950) = 1;
-    w(ty > 1870 & ty < 1950) = (1./80).*(ty(ty > 1870 & ty < 1950)-1870);
+    w = 0.*tcal;
+    w(tcal<1870) = 0;
+    w(tcal>1950) = 1;
+    w(tcal > 1870 & tcal < 1950) = (1./80).*(tcal(tcal > 1870 & tcal < 1950)-1870);
 
-    Nty = length(ty);
-    for tt = 1:Nty
+    Ntcal = length(tcal);
+    for tt = 1:Ntcal
         b_dim(tt,:) = nansum([w(tt).*binst(tt,:); (1-w(tt)).*bproxy(tt,:)]);
     end
 end

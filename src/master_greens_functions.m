@@ -23,14 +23,11 @@ rootname = '../output/green_region'; % directory with impulse response simulatio
 % regions = [5 7 8 9 10 11 12 13 14 15 16 17 18 19];
 
 %% time variables for Green's functions
-tg = T;
-Ntg = length(tg);
-
 % tau = lags in Green's function (centered discretization)
-tau = (tg(1:end-1)+tg(2:end))./2;
+tau = (tg(1:end-1)+tg(2:end))./2; % equal to tgmid
 Ntau = length(tau);
 
-%%% interpolate onto evenly spaced lags. 
+%% linear interpolation in depth
 tmp = interp1(DEPTH,1:NZ,depthlist);
 
 flist = floor(tmp);
@@ -48,22 +45,30 @@ Ebar5 = Ebar3 + Ebar4;
 E_obs_pacz = Ebar5*E_pacz;
 E_obs_atlz = Ebar5*E_atlz;
 
-%% Interpolate Green's function onto a set of lags
-% that match the model timestep
-% is this consistent with the rest of the code?
+%% Interpolate Green's function onto
+%  a set of evenly-spaced lags
+
+% time variables for the model
 dt_model = 5;
 lag = 0:dt_model:2000;
 lagmid = (lag(1:end-1)+lag(2:end))./2;
+
+% calendar time
+tcalend = 2012.5-lagmid(end);
+tcal = 2012.5:-5:tcalend;
+Ntcal = length(tcal);
+ibreak = find(tcal>1870);
+ibreak = ibreak(end);
 
 for zz = 1:Nobsz
     zz
   G_plan{zz} = process_master_greens_functions(Eplan{zz},tg,lag,Nmode,rootname,regions);
 end
 
-%% Try to do same steps but for the plan view on model depths.
+%% Similar but for the plan view on model depths.
 for zz = 1:NZ
     zz
-  G_planmodel{zz} = process_master_greens_functions(Eplanmodel{zz},tg,lag,Nmode,rootname,regions);
+    G_planmodel{zz} = process_master_greens_functions(Eplanmodel{zz},tg,lag,Nmode,rootname,regions);
 end
 
 %% Other diagnostics.

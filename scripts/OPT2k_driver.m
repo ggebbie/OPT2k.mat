@@ -18,7 +18,7 @@ config_model
 config_firstguess
 
 %% combine model and observations for solution
-inversion
+combine_model_obs
 
 %% diagnostics
 % inversion_diags; not checked in yet

@@ -1,15 +1,16 @@
-%% Pre-compute SST impulse responde functions according to 
-% The TMI tendency matrix, L, and the boundary matrix, B, 
+%% Pre-compute SST impulse response functions with 
+%  the TMI tendency matrix, L, and the boundary matrix, B, 
 %  which satisfies dc/dt = L*c + B*q, 
 %  where c is a global tracer distribution and q is a boundary flux.
 Lgreen = L;
 
 %% List the years for which the global tracer is output.
-years = [0:1:100 110:10:1000 1025:25:2000 2100:100:4000 4500 5000]; 
+%  tg  = time Green's function
+tg = [0:1:100 110:10:1000 1025:25:2000 2100:100:4000 4500 5000]; 
 % Note: if years only has 2 times, MATLAB will choose the output
 % frequency (presumably based on the number of timesteps)
-yearsmid = (years(1:end-1)+years(2:end))./2;
-NY = length(years)
+tgmid = (tg(1:end-1)+tg(2:end))./2;
+Ntg = length(tg);
 
 %% Which regions? 
 % Note: discrepancy in ordering between 2x2 and 4x4
@@ -19,7 +20,7 @@ NY = length(years)
 % 17) Atlantic TROP, 18) Pacific TROP, 19) Indian TROP
 
 % Warning: at some point, numerical identification of surface patches changed.
-% Following comments are should be checked.
+% Following comments should be checked.
 % MV TROP FROM 6 - > 8
 % MV ARC FROM 7 -> 6
 % MV med FROM 8 -> 7
@@ -54,19 +55,22 @@ for nmode = regions
   
   filename = ['../output/green_region',num2str(nmode),'_2x2']
 
-  % initialize potential temperature field
-  c0 = zeros(Nfield,1);
-  c0(isfc) = dvol(:,nmode);
-  c0 = mixit(c0,it,jt,kt,inmixlyr);
+  % if response functions already computed, that's great
+  if ~exist([filename,'.mat'])
+      % initialize potential temperature field
+      c0 = zeros(Nfield,1);
+      c0(isfc) = dvol(:,nmode);
+      c0 = mixit(c0,it,jt,kt,inmixlyr);
 
-  % Pre-allocate arrays.
-  clear C T
-  C = nan(NY,Nfield);
-  T = nan(NY,1);
-  
-  % options for the ODE solver.
-  options = odeset('RelTol',1e-4,'AbsTol',1e-4,'Jacobian',Lgreen);
-  tic; [T,C] = ode15s(@(t,x) get_tendency_green(t,x,Lgreen),years, ...
-                      c0,options); toc;
-  eval(['save ',filename,' C T'])
+      % Pre-allocate arrays.
+      clear C T
+      C = nan(Ntg,Nfield);
+      T = nan(Ntg,1);
+      
+      % options for the ODE solver.
+      options = odeset('RelTol',1e-4,'AbsTol',1e-4,'Jacobian',Lgreen);
+      tic; [T,C] = ode15s(@(t,x) get_tendency_green(t,x,Lgreen),tg, ...
+                          c0,options); toc;
+      eval(['save ',filename,' C T'])
+  end
 end

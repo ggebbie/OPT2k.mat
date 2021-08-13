@@ -1,8 +1,10 @@
-%% Inversion: solve for updated SST that fits Challenger-WOCE difference
+%% Combine model and observations
+%  Solve for updated SST that fits Challenger-WOCE difference
+%  This is the inversion or optimization step
 expname = 'OPT-0015'; % 15 CE start time
 
 b_15eq = b0(:);
-iz = 3:16;
+iz = 3:16; % choose with levels to constrain with basinwide-avg Challenger data
 
 % How good is the first guess at fitting the data?
 DT_pacz = (G_pacz_woce-G_pacz_chall)*b_15eq;
@@ -15,13 +17,14 @@ ytilde_15eq = [DT_obs_pacz(iz); DT_obs_atlz(iz)];
 ntilde_15eq = ytilde_15eq - y;
 J_15eq = ntilde_15eq'*iW*ntilde_15eq
 
+% move outside of inversion step?
 config_controls
 
 %% Get global mean constraint.
-tmp = reshape(G_gloz,Nz,Nty,Nmode);
+tmp = reshape(G_gloz,Nz,Ntcal,Nmode);
 for tt = 1:400
   tmp_3d = get_Gt_3d(tmp,tt);
-  tmp_2d = reshape(tmp_3d,Nz,Nty.*Nmode);
+  tmp_2d = reshape(tmp_3d,Nz,Ntcal.*Nmode);
   G_Tbar(tt,:) = tmp_2d(1,:);
 end
 
@@ -36,7 +39,7 @@ yhat(end+1:end+400) = 0;
 
 % should be included in config_controls
 Tbarerr = 0.05;
-Wbar  = Nty.*Tbarerr.^2.*eye(Nty);
+Wbar  = Ntcal.*Tbarerr.^2.*eye(Ntcal);
 iWbar = inv(Wbar);
 What = blkdiag(W,Wbar);
 What2 = blkdiag(W,100.*Wbar); % for errorbars, more realistic 0.1
