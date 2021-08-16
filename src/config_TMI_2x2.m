@@ -28,7 +28,7 @@ end
 
 % avoid using seawater toolbox
 %disty = sw_dist([0 dy],[0 0],'km').*1000;
-disty = dy.*circumdeg;
+disty = dy.*circumperdeg;
 distx = reshape(distx,length(distx),1);
 areaa = disty(ones(NY,NX)).*distx(:,ones(NX,1)); 
 zface= (DEPTH(1:end-1)+DEPTH(2:end))./2;
