@@ -21,14 +21,14 @@ dx = LON(2)-LON(1);
 dy = LAT(2)-LAT(1);
 
 r = 6340e3; %[m]
-circum = 2*pi*r;
+circumperdeg = 2*pi*r./360;
 for ny = 1:length(LAT)
-    distx(ny) = dx.*circum*cosd(LAT(ny));
+    distx(ny) = dx.*circumperdeg*cosd(LAT(ny));
 end
 
 % avoid using seawater toolbox
 %disty = sw_dist([0 dy],[0 0],'km').*1000;
-disty = dy.*circum;
+disty = dy.*circumdeg;
 distx = reshape(distx,length(distx),1);
 areaa = disty(ones(NY,NX)).*distx(:,ones(NX,1)); 
 zface= (DEPTH(1:end-1)+DEPTH(2:end))./2;
