@@ -1,39 +1,55 @@
+% *************************************************************************
+% Assign directory of TMI and update from Github if possible
+% *************************************************************************
 instantiate_TMI
 
-cd ..
-display('read_TMI_from_google_drive m-file not working')
-display('use read_TMI_from_google_drive.sh')
-%read_TMI_from_google_drive
-cd scripts
-datadir = '../data';
-addpath(datadir)
-
+% *************************************************************************
 % surface patches
-load d_all_2deg.mat
+% *************************************************************************
+Surf_Pch = load([dir.data,'d_all_2deg.mat']);
 
+% *************************************************************************
 % circulation (i.e., water-mass with rates) matrix
-load L_2deg_2012
+% *************************************************************************
+M        = load([dir.data,'L_2deg_2012'],'LON','LAT','DEPTH',...
+                'it','jt','kt','L','inmixlyr');
+M.lon    = M.LON(M.it);
+M.lat    = M.LAT(M.jt);
+M.depth  = M.DEPTH(M.kt);
+M.d_all  = Surf_Pch.d_all;
+clear('Surf_Pch');
 
-NZ = max(kt);
-NY = max(jt);
-NX = max(it);
-dx = LON(2)-LON(1);
-dy = LAT(2)-LAT(1);
+% *************************************************************************
+% Assign parameters
+% *************************************************************************
+P.LON    = M.LON;       P.LON   = P.LON(:);       % Confirm P.LON/LAT/DEPTH
+P.LAT    = M.LAT;       P.LAT   = P.LAT(:);       % are column vectors.
+P.DEPTH  = M.DEPTH;     P.DEPTH = P.DEPTH(:);
+P.NZ     = max(M.kt);
+P.NY     = max(M.jt);
+P.NX     = max(M.it);
+P.Nfield = numel(M.it);
+P.Nsfc   = nnz(M.d_all(:,1));
+P.dx     = P.LON(2) - P.LON(1);
+P.dy     = P.LAT(2) - P.LAT(1);
+M = rmfield(M,{'LON','LAT','DEPTH'});
 
-r = 6340e3; %[m]
-circumperdeg = 2*pi*r./360;
-for ny = 1:length(LAT)
-    distx(ny) = dx.*circumperdeg*cosd(LAT(ny));
-end
+% Distance in the east-west direction as a function of latitude -----------
+P.r        = 6340e3; %[m]
+P.circum   = 2 * pi * P.r;
+P.dist_x   = cos(P.LAT/180*pi) .* P.circum .* P.dx / 360;
+P.dist_y   = P.dy .* P.circum / 360;
+P.z_face   = (P.DEPTH(1:end-1) + P.DEPTH(2:end))./2;
+P.dist_z   = ([P.z_face(1) ; diff(P.z_face,[],1); 500]);
+                    % JG: technically this dz is imprecise 
+                    % because center depths not in center of cells.
 
-% avoid using seawater toolbox
-%disty = sw_dist([0 dy],[0 0],'km').*1000;
-disty = dy.*circumperdeg;
-distx = reshape(distx,length(distx),1);
-areaa = disty(ones(NY,NX)).*distx(:,ones(NX,1)); 
-zface= (DEPTH(1:end-1)+DEPTH(2:end))./2;
+% Compute the area and volumn of each grid --------------------------------
+P.area_a = P.dist_x .* P.dist_y;
+P.vl     = P.area_a' .* reshape(P.dist_z,1,1,numel(P.dist_z));
+P.vl     = repmat(P.vl,P.NX,1,1);
+P.vl     = permute(P.vl,[3 2 1]);
 
-% technically this dz is imprecise: center depths not in center of cells.
-dz = ([zface(1) ; diff(zface); 500]);
-vl = permute(areaa(:,:,ones(NZ,1)),[3 1 2]) .*dz(:,ones(NY,1),ones(NX,1));
-vol = field_to_vector(vl,it,jt,kt);
+M.vol    = field_to_vector(P.vl,M.it,M.jt,M.kt);
+P        = rmfield(P,{'dx','dy','r','circum','vl','area_a',...
+                                     'dist_x','dist_y','dist_z','z_face'});

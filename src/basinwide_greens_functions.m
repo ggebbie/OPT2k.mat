@@ -1,150 +1,79 @@
-%% Preparing to make the convolution a simple linear matrix operation.
-%  Slide the green's functions in time.
-%  Put the green's function relative to the right target time. 
-%  programming: lots of copied code, should be a function to handle this
+% *************************************************************************
+% Preparing to make the convolution a simple linear matrix operation.
+% Put the green's function relative to the right target time. 
+% *************************************************************************
 
-Nz = NZ; % should choose a preferred notation
+% *************************************************************************
+% Transfer functions for basin-wide profiles at TMI depth levels
+% *************************************************************************
+PP.account_eq = 1;
+Gz.pac_woce  = get_G(Gz.pac,'WOCE', P,PP);
+Gz.atl_woce  = get_G(Gz.atl,'WOCE', P,PP);
+Gz.pac_chall = get_G(Gz.pac,'Chall',P,PP);
+Gz.atl_chall = get_G(Gz.atl,'Chall',P,PP);
 
-%%% woce: 1990s
-G_pacz_3d = reshape(G_pacz,Nz,Ntcal,Nmode);
-G_pacz_woce_3d= get_Gwoce(G_pacz_3d,tcal);
-G_pacz_woce   = reshape(G_pacz_woce_3d,Nz,Ntcal.*Nmode);
+% *************************************************************************
+% Same basin-wide Transfer functions but for observed depth levels
+% *************************************************************************
+Gz.obs_pac_woce  = get_G(Gz.obs_pac,'WOCE', P,PP);
+Gz.obs_atl_woce  = get_G(Gz.obs_atl,'WOCE', P,PP);
+Gz.obs_pac_chall = get_G(Gz.obs_pac,'Chall',P,PP);
+Gz.obs_atl_chall = get_G(Gz.obs_atl,'Chall',P,PP);
 
-G_atlz_3d = reshape(G_atlz,Nz,Ntcal,Nmode);
-G_atlz_woce_3d= get_Gwoce(G_atlz_3d,tcal);
-G_atlz_woce   = reshape(G_atlz_woce_3d,Nz,Ntcal.*Nmode);
+% *************************************************************************
+% do the case with zero IC to see if there's a difference.
+% *************************************************************************
+% PP.account_eq = 0;
+% Gz.pac_woce_0IC  = get_G(Gz.pac,'WOCE', P,PP);
+% Gz.atl_woce_0IC  = get_G(Gz.atl,'WOCE', P,PP);
+% Gz.pac_chall_0IC = get_G(Gz.pac,'Chall',P,PP);
+% Gz.atl_chall_0IC = get_G(Gz.atl,'Chall',P,PP);
 
-%% do the case with zero IC to see if there's a difference.
-G_pacz_3d = reshape(G_pacz,Nz,Ntcal,Nmode);
-G_pacz_woce_3d= get_Gwoce_0IC(G_pacz_3d,tcal);
-G_pacz_woce_0IC   = reshape(G_pacz_woce_3d,Nz,Ntcal.*Nmode);
+clear('PP')
 
-G_atlz_3d = reshape(G_atlz,Nz,Ntcal,Nmode);
-G_atlz_woce_3d= get_Gwoce_0IC(G_atlz_3d,tcal);
-G_atlz_woce_0IC   = reshape(G_atlz_woce_3d,Nz,Ntcal.*Nmode);
+% *************************************************************************
+function G_out = get_G(G_in,prd_name,P,PP)
 
-G_indz_3d = reshape(G_indz,Nz,Ntcal,Nmode);
-G_indz_woce_3d= get_Gwoce(G_indz_3d,tcal);
-G_indz_woce   = reshape(G_indz_woce_3d,Nz,Ntcal.*Nmode);
+    N          = size(G_in,1);
+    N_tcal     = P.Ntcal;
+    N_mode     = numel(P.regions);
+    ty         = P.tcal;
 
-G_sthz_3d = reshape(G_sthz,Nz,Ntcal,Nmode);
-G_sthz_woce_3d= get_Gwoce(G_sthz_3d,tcal);
-G_sthz_woce   = reshape(G_sthz_woce_3d,Nz,Ntcal.*Nmode);
+    G_in       = reshape(G_in,N,N_tcal,N_mode);
+    G_out      = zeros(size(G_in));    
+    
+    if strcmp(prd_name,'Chall')
+        t_list = [1875 1870 1880];
+        w      = [1/2 1/4 1/4];
+    elseif strcmp(prd_name,'WOCE')
+        t_list = [1990 1995 2000 2005];
+        w      = [1 2 3/2 1/2];        w = w./sum(w);
+    end
 
-G_gloz_3d = reshape(G_gloz,Nz,Ntcal,Nmode);
-G_gloz_woce_3d= get_Gwoce(G_gloz_3d,tcal);
-G_gloz_woce   = reshape(G_gloz_woce_3d,Nz,Ntcal.*Nmode);
+    % Add for time-averaging overlap --------------------------------------
+    for ct     = 1:numel(t_list)
+        t      = find(ty+2.5 == t_list(ct));
+        G_out  = G_out + get_Gt(G_in,t,PP) .* w(ct);
+    end
+    
+    G_out      = reshape(G_out,N,N_tcal.*N_mode);
+end
 
-%%% challenger
-G_pacz_3d = reshape(G_pacz,Nz,Ntcal,Nmode);
-G_pacz_chall_3d= get_Gchall(G_pacz_3d,tcal);
-G_pacz_chall   = reshape(G_pacz_chall_3d,Nz,Ntcal.*Nmode);
+% -------------------------------------------------------------------------
+function G_out = get_Gt(G_in,tt,PP)
+    %
+    % Get the Green's function for output at a specific time.
+    % tt = time index.
+    % assume time-spacing on Green's function is identical to tt.
 
-G_atlz_3d = reshape(G_atlz,Nz,Ntcal,Nmode);
-G_atlz_chall_3d= get_Gchall(G_atlz_3d,tcal);
-G_atlz_chall   = reshape(G_atlz_chall_3d,Nz,Ntcal.*Nmode);
+    N2         = size(G_in,2);
+    
+    G_out      = zeros(size(G_in)); % add for time-averaging overlap.
+    Ngood      = length(tt:N2); % could be a problem if tt is too long.
+    G_out(:,tt:N2-1,:) = G_in(:,1:Ngood-1,:); % slides it.
 
-% 0IC
-G_pacz_3d = reshape(G_pacz,Nz,Ntcal,Nmode);
-G_pacz_chall_3d= get_Gchall_0IC(G_pacz_3d,tcal);
-G_pacz_chall_0IC   = reshape(G_pacz_chall_3d,Nz,Ntcal.*Nmode);
-
-G_atlz_3d = reshape(G_atlz,Nz,Ntcal,Nmode);
-G_atlz_chall_3d= get_Gchall_0IC(G_atlz_3d,tcal);
-G_atlz_chall_0IC   = reshape(G_atlz_chall_3d,Nz,Ntcal.*Nmode);
-
-G_indz_3d = reshape(G_indz,Nz,Ntcal,Nmode);
-G_indz_chall_3d= get_Gchall(G_indz_3d,tcal);
-G_indz_chall   = reshape(G_indz_chall_3d,Nz,Ntcal.*Nmode);
-
-G_sthz_3d = reshape(G_sthz,Nz,Ntcal,Nmode);
-G_sthz_chall_3d= get_Gchall(G_sthz_3d,tcal);
-G_sthz_chall   = reshape(G_sthz_chall_3d,Nz,Ntcal.*Nmode);
-
-%%% argo
-G_pacz_3d = reshape(G_pacz,Nz,Ntcal,Nmode);
-G_pacz_argo_3d= get_Gargo(G_pacz_3d,tcal);
-G_pacz_argo   = reshape(G_pacz_argo_3d,Nz,Ntcal.*Nmode);
-
-G_atlz_3d = reshape(G_atlz,Nz,Ntcal,Nmode);
-G_atlz_argo_3d= get_Gargo(G_atlz_3d,tcal);
-G_atlz_argo   = reshape(G_atlz_argo_3d,Nz,Ntcal.*Nmode);
-
-G_indz_3d = reshape(G_indz,Nz,Ntcal,Nmode);
-G_indz_argo_3d= get_Gargo(G_indz_3d,tcal);
-G_indz_argo   = reshape(G_indz_argo_3d,Nz,Ntcal.*Nmode);
-
-G_sthz_3d = reshape(G_sthz,Nz,Ntcal,Nmode);
-G_sthz_argo_3d= get_Gargo(G_sthz_3d,tcal);
-G_sthz_argo   = reshape(G_sthz_argo_3d,Nz,Ntcal.*Nmode);
-
-%% same basin-wide profiles, but averaged at the obs points
-
-%% woce
-G_obs_pacz_3d = reshape(G_obs_pacz,Nobsz,Ntcal,Nmode);
-G_obs_pacz_woce_3d= get_Gwoce(G_obs_pacz_3d,tcal);
-G_obs_pacz_woce   = reshape(G_obs_pacz_woce_3d,Nobsz,Ntcal.*Nmode);
-
-G_obs_atlz_3d = reshape(G_obs_atlz,Nobsz,Ntcal,Nmode);
-G_obs_atlz_woce_3d= get_Gwoce(G_obs_atlz_3d,tcal);
-G_obs_atlz_woce   = reshape(G_obs_atlz_woce_3d,Nobsz,Ntcal.*Nmode);
-
-%% challenger
-G_obs_pacz_3d = reshape(G_obs_pacz,Nobsz,Ntcal,Nmode);
-G_obs_pacz_chall_3d= get_Gchall(G_obs_pacz_3d,tcal);
-G_obs_pacz_chall   = reshape(G_obs_pacz_chall_3d,Nobsz,Ntcal.*Nmode);
-
-G_obs_atlz_3d = reshape(G_obs_atlz,Nobsz,Ntcal,Nmode);
-G_obs_atlz_chall_3d= get_Gchall(G_obs_atlz_3d,tcal);
-G_obs_atlz_chall   = reshape(G_obs_atlz_chall_3d,Nobsz,Ntcal.*Nmode);
-
-%% argo
-G_obs_pacz_3d = reshape(G_obs_pacz,Nobsz,Ntcal,Nmode);
-G_obs_pacz_argo_3d= get_Gargo(G_obs_pacz_3d,tcal);
-G_obs_pacz_argo   = reshape(G_obs_pacz_argo_3d,Nobsz,Ntcal.*Nmode);
-
-G_obs_atlz_3d = reshape(G_obs_atlz,Nobsz,Ntcal,Nmode);
-G_obs_atlz_argo_3d= get_Gargo(G_obs_atlz_3d,tcal);
-G_obs_atlz_argo   = reshape(G_obs_atlz_argo_3d,Nobsz,Ntcal.*Nmode);
-
-%% Similar process for other diagnostics
-G_cmeters_3d = reshape(G_cmeters,Nsfc,Ntcal,Nmode);
-G_cmeters_2010 = get_Gt(G_cmeters_3d,2);
-G_cmeters_2010 = reshape(G_cmeters_2010,Nsfc,Ntcal.*Nmode);
-
-G_cmeters_1995 = get_Gt(G_cmeters_3d,5);
-G_cmeters_1995 = reshape(G_cmeters_1995,Nsfc,Ntcal.*Nmode);
-
-G_cmeters_1970 = get_Gt(G_cmeters_3d,10);
-G_cmeters_1970 = reshape(G_cmeters_1970,Nsfc,Ntcal.*Nmode);
-
-% G_all not calculated
-% G_all_3d = reshape(G_all,Nfield,Ntcal,Nmode);
-% G_all_woce = get_Gwoce(G_all_3d,tcal);
-% G_all_woce = reshape(G_all_woce,Nfield,Ntcal.*Nmode);
-
-% G_all_3d = reshape(G_all,Nfield,Ntcal,Nmode);
-% G_all_chall = get_Gchall(G_all_3d,tcal);
-% G_all_chall = reshape(G_all_chall,Nfield,Ntcal.*Nmode);
-
-G_z2500_3d = reshape(G_z2500,Nsfc,Ntcal,Nmode);
-G_z2500_woce = get_Gwoce(G_z2500_3d,tcal);
-G_z2500_woce = reshape(G_z2500_woce,Nsfc,Ntcal.*Nmode);
-
-G_z2500_3d = reshape(G_z2500,Nsfc,Ntcal,Nmode);
-G_z2500_chall = get_Gchall(G_z2500_3d,tcal);
-G_z2500_chall = reshape(G_z2500_chall,Nsfc,Ntcal.*Nmode);
-
-%% make plan view
-for zz = 1:Nobsz
-    zz
-    G_plan_3d = reshape(G_plan{zz},Nsfc,Ntcal,Nmode);
-
-    % woce
-    G_plan_woce_3d= get_Gwoce(G_plan_3d,tcal);
-    G_plan_woce{zz}   = reshape(G_plan_woce_3d,Nsfc,Ntcal.*Nmode);
-
-    % challenger
-    G_plan_chall_3d= get_Gchall(G_plan_3d,tcal);
-    G_plan_chall{zz}   = reshape(G_plan_chall_3d,Nsfc,Ntcal.*Nmode);
+    % takes into account equilibrium initial conditions.
+    if PP.account_eq  == 1
+        G_out(:,N2,:)  = sq(sum(G_in(:,Ngood:N2,:),2)); 
+    end
 end

@@ -1,42 +1,40 @@
-%% Challenger_WOCE Temperature Structure halfdegree was updated 
-%  to be in list form.
+% *************************************************************************
+% Load basin averaged Challanger observations (O.), which is the output of
+% a data assimilation analysis following Section S5.4 of GH19. 
+% *************************************************************************
+Chllngr = matfile([dir.data,'Challenger_WOCE_Temperature_list']);
+Chllngr2 = load([dir.data,'Challenger_WOCE_Temperature_basinwide_avg']);
 
-% is data already in the path? if not, then
-addpath('../data')
+% Depth levels to be analyzed ---------------------------------------------
+zchall = 3:17;
 
-load Challenger_WOCE_Temperature_list
+% Pacific observational profile -------------------------------------------
+O.ypac = -Chllngr2.mTpz_LS(zchall);
 
-% observational matrix
-E_obs = E;
+% Atlantic observational profile ------------------------------------------
+O.yatl = -Chllngr2.mTaz_LS(zchall);
 
-%% Basinwide averages of Challenger data
-%  Tait correction for pressure-dependent errors is included
-load Challenger_WOCE_Temperature_basinwide_avg
+% One observational vector ------------------------------------------------
+O.y = [O.ypac; O.yatl];
 
-Nobsz = length(depthlist); % how many Challenger standard depths?
-% combine depth(1) and depth(2) to avoid seasonal issues
-mTpz_LS(2) = (mTpz_LS(1) + mTpz_LS(2))./2;
-mTaz_LS(2) = (mTaz_LS(1) + mTaz_LS(2))./2;
+% Error covariance matrix -------------------------------------------------
+O.Cxbar = blkdiag(Chllngr2.mTpz_C(zchall,zchall),...
+                  Chllngr2.mTaz_C(zchall,zchall));
 
-% depth levels to be analyzed
-% what is rationale for cutting this?
-zchall = 2:15;
+% Inverse normalzchalled weighting matrix ---------------------------------
+O.Nobschall = length(O.ypac);
+O.iW = 1./(2 .* O.Nobschall) .* inv(O.Cxbar);
 
-% Pacific observational profile
-ypac = -mTpz_LS(zchall);
+% Normalzchalled weighting matrix -----------------------------------------
+O.W  = (2 .* O.Nobschall) .* O.Cxbar;
 
-% Atlantic
-yatl = -mTaz_LS(zchall);
+% Depth information of observational estimates ----------------------------
+O.depthlist  = Chllngr2.depthlist;                 % Total list of depth
+O.depth_used = zchall;                             % Depth level of O.y
 
-% one observational vector
-y = [ypac; yatl];
-Nobschall = length(ypac);
+% Dimentionality of observational estimates -------------------------------
+P.Nobs  = size(Chllngr.E,1);                       % Number of obseravtions
+P.Nobsz = length(O.depthlist);                     % Number of obs. depth
 
-% error covariance matrix.
-Cxbar = blkdiag(mTpz_C(zchall,zchall),mTaz_C(zchall,zchall));
-
-% inverse normalzchalled weighting matrix
-iW = 1./(2.*Nobschall).*inv(Cxbar);
-
-% normalzchalled weighting matrix
-W  = (2.*Nobschall).*Cxbar;
+clear('zchall','Chllngr2','Chllngr')
+O = rmfield(O,{'ypac','yatl','Nobschall'});

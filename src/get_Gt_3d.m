@@ -1,4 +1,4 @@
-function [Gout]=get_Gt_3d(Gin,tt);
+function [Gout]=get_Gt_3d(Gin,tt)
 %
 % Get the Green's function for output at a specific time.
 % tt = time index.
