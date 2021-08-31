@@ -5,8 +5,19 @@
 tic;
 clear; close all;
 
-% Add all folders in this directory to the path of Matlab -----------------
-addpath(genpath(pwd))
+% *************************************************************************
+% Set directories and add all folders in this directory to Matlab's path
+% *************************************************************************
+% -> $home 
+%        |-> OPT2k  [Working directory]
+%        |       |-> scripts  :: main files
+%        |       |-> src      :: functions and subrountines
+%        |       |-> data     :: directory of supporting data  
+%        |       `-> output   :: directory for linear response functions     
+%        `-> TMI
+%              |-> scripts    :: forward and steady-state solver
+%              `-> src        :: functions and subrountines
+dir = initilize_directories;
 
 % User defined parameter  -------------------------------------------------
 P.smallregions = 1;   % 1: use 14 regions to run the linear response function
@@ -19,14 +30,6 @@ P.smallregions = 1;   % 1: use 14 regions to run the linear response function
 % 17) Atlantic TROP,     18) Pacific TROP,       19) Indian TROP
 
 % LET'S GET STARTED! Y^_^Y 
-
-% *************************************************************************
-% Set directories (moved into a function?)
-% *************************************************************************
-dir.home  = '/Users/duochan/Dropbox/Git_code/';
-dir.opt2k = [dir.home,'OPT2k/'];  cd(dir.opt2k);
-dir.data  = [dir.opt2k,'data/'];
-dir.output = [dir.opt2k,'output/'];
 
 % *************************************************************************
 % Obtain 2x2^o model (M.) from TMI repository and assign parameters (P.):
@@ -134,3 +137,52 @@ clear('N')
 
 toc;
 % [Duo]: It takes only 63 seconds to run on my laptop 
+
+
+% *************************************************************************
+% *************************************************************************
+% *************************************************************************
+
+function dir = initilize_directories
+
+    d       = pwd;
+    id      = strfind(d,'OPT2k');
+    ct      = 0;
+    while isempty(id)  
+        ct  = ct + 1;
+        if ct > 3, error('Cannot get a valid OPT2k directory, exited!'); end
+        if ct > 1, disp('There is no ''OPT2k'' in the directory ...'); end
+        d   = input('Please type in the directory of OPT2k ...','s');
+        id  = strfind(d,'OPT2k');
+    end
+    d = d(1:id+4);
+    cd(d);    addpath(genpath(pwd));    clear('d')
+    dir.opt2k   = [pwd,'/'];
+    id          = strfind(pwd,'OPT2k');
+    dir.data    = [dir.opt2k,'data/'];
+    dir.output  = [dir.opt2k,'output/'];
+    dir.TMI     = [dir.opt2k,'TMI/'];
+
+    if exist(dir.TMI,'dir')
+        TMI_exist = 1;
+    else
+        dir.TMI     = [dir.opt2k(1:id-1),'TMI/'];
+        if exist(dir.TMI,'dir')
+            TMI_exist = 1; 
+        else
+            TMI_exist = 0;  
+        end
+    end
+    % TMI is supposed to be at the same level as POT2k
+
+    if TMI_exist == 0  % Git clone TMI repository
+        disp('TMI project does not exist, clone TMI project...');
+        !git clone https://github.com/ggebbie/TMI ../TMI
+    else               % Update existing TMI repository
+        cd(dir.TMI);
+        !git fetch origin
+        !git pull origin refs/heads/main
+        cd(dir.opt2k);
+    end
+    clear('ct','TMI_exist','id')
+end
