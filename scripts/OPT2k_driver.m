@@ -9,14 +9,14 @@ clear; close all;
 % Set directories and add all folders in this directory to Matlab's path
 % *************************************************************************
 % -> $home 
-%        |-> OPT2k  [Working directory]
-%        |       |-> scripts  :: main files
-%        |       |-> src      :: functions and subrountines
-%        |       |-> data     :: directory of supporting data  
-%        |       `-> output   :: directory for linear response functions     
-%        `-> TMI
-%              |-> scripts    :: forward and steady-state solver
-%              `-> src        :: functions and subrountines
+%        `-> OPT2k  [Working directory]
+%                |-> scripts    :: main files
+%                |-> src        :: functions and subrountines
+%                |-> data       :: directory of supporting data  
+%                |-> output     :: directory for linear response functions     
+%                `-> TMI
+%                      |-> scripts    :: forward and steady-state solver
+%                      `-> src        :: functions and subrountines
 dir = initilize_directories;
 
 % User defined parameter  -------------------------------------------------
@@ -166,18 +166,13 @@ function dir = initilize_directories
     if exist(dir.TMI,'dir')
         TMI_exist = 1;
     else
-        dir.TMI     = [dir.opt2k(1:id-1),'TMI/'];
-        if exist(dir.TMI,'dir')
-            TMI_exist = 1; 
-        else
-            TMI_exist = 0;  
-        end
+        TMI_exist = 0;
     end
-    % TMI is supposed to be at the same level as POT2k
+    % TMI is supposed to be a sub-directory of POT2k
 
     if TMI_exist == 0  % Git clone TMI repository
         disp('TMI project does not exist, clone TMI project...');
-        !git clone https://github.com/ggebbie/TMI ../TMI
+        !git clone https://github.com/ggebbie/TMI   TMI
     else               % Update existing TMI repository
         cd(dir.TMI);
         !git fetch origin
