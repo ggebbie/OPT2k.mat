@@ -1,4 +1,4 @@
-# OPT2k
+# OPT2k.mat
 
 Ocean Potential Temperature of the last 2k years (15 - 2015 CE)
 
